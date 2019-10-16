@@ -1,5 +1,14 @@
 import styled from "styled-components";
-import { Card, List } from "antd";
+import { Card, List, Layout } from "antd";
+const { Sider } = Layout;
+
+export const UpperBody = styled.div`
+  display: flex;
+  width: 100%;
+  height: 100%;
+  justify-content: space-between;
+  flex-direction: row;
+`;
 
 export const Body = styled.div`
   display: flex;
@@ -52,4 +61,8 @@ export const Title = styled.h1`
 export const ComparisonList = styled(List)`
   overflow: scroll;
   max-height: 50vh;
+`;
+
+export const CustomSider = styled(Sider)`
+  background: #fff;
 `;
