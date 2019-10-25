@@ -10,7 +10,9 @@ import {
   ListWrapper,
   ModalContentWrapper,
   Title,
-  ComparisonList
+  ComparisonList,
+  CustomSider,
+  UpperBody
 } from "./styles";
 
 import _ from "lodash";
@@ -26,6 +28,7 @@ function App() {
   const [selectedMovie, setSelectedMovie] = useState({});
   const [movieToCompare, setMovieToCompare] = useState({});
   const [error, setError] = useState("");
+  const [collapsed, setCollapsed] = useState(false);
 
   const searchMovies = () => {
     setError("");
@@ -71,6 +74,8 @@ function App() {
     const movie = movies.find(movie => movie.imdbID === id);
     setMovieToCompare(movie);
   };
+
+  const onCollapse = () => setCollapsed(!collapsed);
 
   useEffect(() => {
     const likedOnes = movies.filter(movie => movie.like);
@@ -190,17 +195,12 @@ function App() {
           </MovieCard>
           {!!_.isEmpty(movieToCompare) ? (
             <ListWrapper>
-              <h4>Select a movie to compare</h4>
-              <ComparisonList
-                dataSource={movies.filter(
-                  movie => movie.imdbID !== selectedMovie.imdbID
-                )}
+              <h3>Liked Movies</h3>
+              <List
+                dataSource={likedMovies}
                 renderItem={item => (
-                  <ComparisonList.Item
-                    onClick={() => setComparison(item.imdbID)}
-                    key={item.imdbID}
-                  >
-                    <ComparisonList.Item.Meta
+                  <List.Item key={item.imdbID}>
+                    <List.Item.Meta
                       avatar={
                         <Avatar
                           src={item.Poster === "N/A" ? noImageUrl : item.Poster}
@@ -209,11 +209,77 @@ function App() {
                       title={<p>{item.Title}</p>}
                       description={item.Year}
                     />
-                  </ComparisonList.Item>
+                  </List.Item>
                 )}
               />
             </ListWrapper>
-          ) : (
+          )}
+        </CustomSider>
+        <Title>Search, Compare and Like movies</Title>
+        <Header>
+          <Form layout="inline" onSubmit={handleSubmit}>
+            <Form.Item>
+              <Input
+                onChange={e => setTitle(e.target.value)}
+                placeholder="Movie Title"
+                value={title}
+              />
+            </Form.Item>
+            <Form.Item>
+              <Button type="primary" htmlType="submit">
+                Buscar
+              </Button>
+            </Form.Item>
+          </Form>
+        </Header>
+        <Container>
+          <MovieList>
+            {error !== "" ? (
+              <h3>{error}</h3>
+            ) : (
+              movies.map(movie => {
+                return (
+                  <MovieItem key={movie.imdbID}>
+                    <MovieCard
+                      hoverable
+                      style={{ width: 240 }}
+                      cover={
+                        <img
+                          onClick={() => openModal(movie.imdbID)}
+                          alt="poster"
+                          src={
+                            movie.Poster === "N/A" ? noImageUrl : movie.Poster
+                          }
+                          height={300}
+                        />
+                      }
+                      actions={[
+                        <Icon
+                          onClick={() => handleClick(movie.imdbID)}
+                          theme={movie.like ? "filled" : "outlined"}
+                          type="like"
+                          key="like"
+                        />
+                      ]}
+                    >
+                      <Meta
+                        title={movie.Title}
+                        description={`${movie.Year} | ${movie.Type}`}
+                      />
+                    </MovieCard>
+                  </MovieItem>
+                );
+              })
+            )}
+          </MovieList>
+        </Container>
+        <Modal
+          title="Compare movies"
+          visible={visible}
+          onOk={handleOk}
+          onCancel={handleCancel}
+        >
+          <ModalContentWrapper>
             <MovieCard
               hoverable
               style={{ width: 240 }}
@@ -221,23 +287,72 @@ function App() {
                 <img
                   alt="poster"
                   src={
-                    movieToCompare.Poster === "N/A"
+                    selectedMovie.Poster === "N/A"
                       ? noImageUrl
-                      : movieToCompare.Poster
+                      : selectedMovie.Poster
                   }
                   height={300}
                 />
               }
             >
               <Meta
-                title={movieToCompare.Title}
-                description={`${movieToCompare.Year} | ${movieToCompare.Type}`}
+                title={selectedMovie.Title}
+                description={`${selectedMovie.Year} | ${selectedMovie.Type}`}
               />
             </MovieCard>
-          )}
-        </ModalContentWrapper>
-      </Modal>
-    </Body>
+            {!!_.isEmpty(movieToCompare) ? (
+              <ListWrapper>
+                <h4>Select a movie to compare</h4>
+                <ComparisonList
+                  dataSource={movies.filter(
+                    movie => movie.imdbID !== selectedMovie.imdbID
+                  )}
+                  renderItem={item => (
+                    <ComparisonList.Item
+                      onClick={() => setComparison(item.imdbID)}
+                      key={item.imdbID}
+                    >
+                      <ComparisonList.Item.Meta
+                        avatar={
+                          <Avatar
+                            src={
+                              item.Poster === "N/A" ? noImageUrl : item.Poster
+                            }
+                          />
+                        }
+                        title={<p>{item.Title}</p>}
+                        description={item.Year}
+                      />
+                    </ComparisonList.Item>
+                  )}
+                />
+              </ListWrapper>
+            ) : (
+              <MovieCard
+                hoverable
+                style={{ width: 240 }}
+                cover={
+                  <img
+                    alt="poster"
+                    src={
+                      movieToCompare.Poster === "N/A"
+                        ? noImageUrl
+                        : movieToCompare.Poster
+                    }
+                    height={300}
+                  />
+                }
+              >
+                <Meta
+                  title={movieToCompare.Title}
+                  description={`${movieToCompare.Year} | ${movieToCompare.Type}`}
+                />
+              </MovieCard>
+            )}
+          </ModalContentWrapper>
+        </Modal>
+      </Body>
+    </UpperBody>
   );
 }
 
