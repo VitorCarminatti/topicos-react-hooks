@@ -36,7 +36,12 @@ export const MovieItem = styled.li`
 export const MovieCard = styled(Card)``;
 
 export const ListWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
   margin-top: 20px;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
 `;
 
 export const ModalContentWrapper = styled.div`
