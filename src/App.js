@@ -120,7 +120,12 @@ function App() {
                         onClick={() => handleClick(movie.imdbID)}
                         theme={movie.like ? "filled" : "outlined"}
                         type="like"
-                        key="like"
+                        key={Math.random(movie.imdbID)}
+                      />,
+                      <Icon
+                        onClick={() => console.log("Implementar dislike")}
+                        type="dislike"
+                        key={Math.random(movie.Year)}
                       />
                     ]}
                   >
